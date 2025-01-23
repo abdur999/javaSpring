@@ -21,6 +21,9 @@ dependencies {
 	// Spring Boot Web dependency for building REST APIs
 	implementation 'org.springframework.boot:spring-boot-starter'
 
+	// Manual JSON Creation dependency added in Spring Boot Web
+	implementation group: 'org.json', name: 'json', version: '20250107'
+
 	// Spring Boot Web dependency for building REST APIs
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 

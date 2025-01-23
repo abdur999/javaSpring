@@ -4,6 +4,11 @@ public class User {
     private String username;
     private String email;
 
+    public User(String username, String mail) {
+        this.username = username;
+        this.email = mail;
+    }
+
     // Getters and Setters
     public String getUsername() {
         return username;

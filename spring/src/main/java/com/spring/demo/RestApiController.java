@@ -7,8 +7,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.json.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+
 import java.util.Arrays;
 import java.util.List;
+import java.util.Date;
 
 @RestController
 @RequestMapping("/api/users")
@@ -25,19 +29,33 @@ public class RestApiController {
         return totalJson.toString();
     }
 
-    @PostMapping
-    public String createUser(@RequestBody User user) {
+    @PostMapping("/date")
+    public ResponseEntity<String> inputDate(@RequestBody RquestDateDTO rdd) {
+        Date receivedDate = rdd.getDate();
+        return ResponseEntity.ok("Received date: "+receivedDate);
+    }
+    @PostMapping("/signup")
+    public String createUser(@RequestBody RegisteredUser user) {
         // Logic to create the user would go here (e.g., saving to the database)
         JSONObject totalJson = new JSONObject();
         totalJson.put("message","Success");
-        totalJson.put("user",user.getUsername());
+        totalJson.put("user",user.getDob());
         return totalJson.toString();
     }
     @GetMapping("/list")
-    public List<User> getAllUser() {
+    public List<RegisteredUser> getAllUser() {
         return Arrays.asList(
-                new User("John Doe", "johndoe@example.com"),
-                new User("Jane Doe", "jane.doe@example.com")
+                new RegisteredUser("John Doe", "johndoe@example.com"),
+                new RegisteredUser("Jane Doe", "jane.doe@example.com")
         );
+    }
+
+    @Autowired
+    private UserService userService;
+
+    @PostMapping("/register")
+    public ResponseEntity<RegisteredUser> registerUser(@RequestBody RegisteredUser user) {
+        RegisteredUser registeredUser = userService.registerUser(user);
+        return ResponseEntity.ok(registeredUser);
     }
 }

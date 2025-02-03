@@ -13,16 +13,26 @@ RegisteredUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
+    @Column(name = "username")
     private String username;
+    @Column(name = "email")
     private String email;
+    @Column(name = "first_name")
     private String firstName;
+    @Column(name = "last_name")
     private String lastName;
+    @Column(name = "phone_no")
     private String phoneNo;
+    @Column(name = "whatsapp_no")
     private String whatsappNo;
+    @Column(name = "gender")
     private String gender;
+    @Column(name = "dob")
     private Date dob;
+    @Column(name = "profile_image_url")
     private String profileImageUrl;
 
     public RegisteredUser() {

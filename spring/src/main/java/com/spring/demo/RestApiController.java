@@ -46,7 +46,8 @@ public class RestApiController {
                     .body(response);
         } else {
             // Logic to create the user would go here (e.g., saving to the database)
-
+            // Save the user
+            RegisteredUser savedUser = userService.registerUser(user);
             response = new PartialResponse("Success","User registered successfully");
             // Returning the list wrapped in ResponseEntity
             return ResponseEntity.status(HttpStatus.OK)

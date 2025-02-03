@@ -1,5 +1,7 @@
 package com.spring.demo;
 
+import Response.PartialResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,12 +37,21 @@ public class RestApiController {
         return ResponseEntity.ok("Received date: "+receivedDate);
     }
     @PostMapping("/signup")
-    public String createUser(@RequestBody RegisteredUser user) {
-        // Logic to create the user would go here (e.g., saving to the database)
-        JSONObject totalJson = new JSONObject();
-        totalJson.put("message","Success");
-        totalJson.put("user",user.getDob());
-        return totalJson.toString();
+    public ResponseEntity<PartialResponse> createUser(@RequestBody RegisteredUser user) {
+        //Check for required parameter if its missing set response
+        PartialResponse response;
+        if(user.getFirstName() == null || user.getLastName() == null || user.getUsername() == null || user.getEmail() == null || user.getPhoneNo() == null || user.getDob() == null || user.getGender() == null || user.getWhatsappNo() == null || user.getProfileImageUrl() == null ) {
+            response = new PartialResponse("Failure","you have other missing parameter");
+            return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
+                    .body(response);
+        } else {
+            // Logic to create the user would go here (e.g., saving to the database)
+
+            response = new PartialResponse("Success","User registered successfully");
+            // Returning the list wrapped in ResponseEntity
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(response);
+        }
     }
     @GetMapping("/list")
     public List<RegisteredUser> getAllUser() {

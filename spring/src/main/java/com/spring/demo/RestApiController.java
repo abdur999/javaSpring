@@ -1,6 +1,7 @@
 package com.spring.demo;
 
 import Response.PartialResponse;
+import Response.ValidationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,9 +48,15 @@ public class RestApiController {
         } else {
             // Logic to create the user would go here (e.g., saving to the database)
             // Save the user
-            RegisteredUser savedUser = userService.registerUser(user);
-            response = new PartialResponse("Success","User registered successfully");
-            // Returning the list wrapped in ResponseEntity
+            ValidationResponse validResponse = userService.checkIfExists(user.getEmail(),user.getPhoneNo());
+            if(validResponse.getCode() == 0) {
+                RegisteredUser savedUser = userService.registerUser(user);
+                response = new PartialResponse("Success", "User registered successfully");
+                // Returning the list wrapped in ResponseEntity
+            } else {
+                response = new PartialResponse("Failure", "Email or phone number already exist");
+                // Returning the list wrapped in ResponseEntity
+            }
             return ResponseEntity.status(HttpStatus.OK)
                     .body(response);
         }

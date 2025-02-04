@@ -6,9 +6,11 @@ import java.util.Date;
 
 
 @Entity
-@Table(name = "users")
-public class
-RegisteredUser {
+@Table(name = "users", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"email"}),
+        @UniqueConstraint(columnNames = {"phone_no"})
+})
+public class RegisteredUser {
 
 
     @Id

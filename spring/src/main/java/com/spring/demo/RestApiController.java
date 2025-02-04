@@ -101,5 +101,16 @@ public class RestApiController {
         return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
     }
 
-
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleGeneralException(Exception ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                LocalDateTime.now(),
+                "Internal Server Error",
+                request.getDescription(false),
+                "Unknown",
+                "Unknown",
+                ex.getMessage()
+        );
+        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

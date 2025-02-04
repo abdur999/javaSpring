@@ -2,12 +2,9 @@ package com.spring.demo;
 
 import Response.PartialResponse;
 import Response.ValidationResponse;
+import exceptiion.ResourceAlreadyExistException;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.json.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +53,7 @@ public class RestApiController {
             } else {
                 response = new PartialResponse("Failure", "Email or phone number already exist");
                 // Returning the list wrapped in ResponseEntity
+                throw new ResourceAlreadyExistException("Email or phone number already exist");
             }
             return ResponseEntity.status(HttpStatus.OK)
                     .body(response);
@@ -76,5 +74,10 @@ public class RestApiController {
     public ResponseEntity<RegisteredUser> registerUser(@RequestBody RegisteredUser user) {
         RegisteredUser registeredUser = userService.registerUser(user);
         return ResponseEntity.ok(registeredUser);
+    }
+
+    @ExceptionHandler(ResourceAlreadyExistException.class)
+    public ResponseEntity<String> handleResourceAlreadyExists(ResourceAlreadyExistException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

@@ -1,8 +1,28 @@
 package exceptiion;
 
 public class ResourceAlreadyExistException extends RuntimeException {
-    // Custom Exception
-        public ResourceAlreadyExistException(String message) {
-            super(message);
-        }
+    private String resourceName;
+    private String fieldName;
+    private Object fieldValue;
+
+    public ResourceAlreadyExistException(String resourceName, String fieldName, Object fieldValue) {
+        super(String.format("%s with %s '%s' already exists", resourceName, fieldName, fieldValue));
+        this.resourceName = resourceName;
+        this.fieldName = fieldName;
+        this.fieldValue = fieldValue;
+
+    }
+
+    // Getters for the fields
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public String getFieldName() {
+        return fieldName;
+    }
+
+    public Object getFieldValue() {
+        return fieldValue;
+    }
 }

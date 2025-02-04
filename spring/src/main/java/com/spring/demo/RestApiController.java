@@ -2,6 +2,7 @@ package com.spring.demo;
 
 import Response.PartialResponse;
 import Response.ValidationResponse;
+import exceptiion.ErrorDetails;
 import exceptiion.ResourceAlreadyExistException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +10,9 @@ import org.json.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.WebRequest;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Date;
@@ -35,7 +38,7 @@ public class RestApiController {
         return ResponseEntity.ok("Received date: "+receivedDate);
     }
     @PostMapping("/signup")
-    public ResponseEntity<PartialResponse> createUser(@RequestBody RegisteredUser user) {
+    public ResponseEntity<?> createUser(@RequestBody RegisteredUser user) {
         //Check for required parameter if its missing set response
         PartialResponse response;
         if(user.getFirstName() == null || user.getLastName() == null || user.getUsername() == null || user.getEmail() == null || user.getPhoneNo() == null || user.getDob() == null || user.getGender() == null || user.getWhatsappNo() == null || user.getProfileImageUrl() == null ) {
@@ -50,10 +53,12 @@ public class RestApiController {
                 RegisteredUser savedUser = userService.registerUser(user);
                 response = new PartialResponse("Success", "User registered successfully");
                 // Returning the list wrapped in ResponseEntity
-            } else {
-                response = new PartialResponse("Failure", "Email or phone number already exist");
+            } else if(validResponse.getCode() == 1) {
+//                response = new PartialResponse("Failure", "Email or phone number already exist");
                 // Returning the list wrapped in ResponseEntity
-                throw new ResourceAlreadyExistException("Email or phone number already exist");
+                throw new ResourceAlreadyExistException("User","email",user.getEmail());
+            } else {
+                throw new ResourceAlreadyExistException("User","phone",user.getPhoneNo());
             }
             return ResponseEntity.status(HttpStatus.OK)
                     .body(response);
@@ -77,7 +82,24 @@ public class RestApiController {
     }
 
     @ExceptionHandler(ResourceAlreadyExistException.class)
-    public ResponseEntity<String> handleResourceAlreadyExists(ResourceAlreadyExistException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorDetails> handleResourceAlreadyExists(ResourceAlreadyExistException ex, WebRequest request) {
+
+        // Log the error
+        //logger.error("Error occurred: {}", ex.getMessage());
+
+        // Create ErrorDetails object
+        ErrorDetails errorDetails = new ErrorDetails(
+                LocalDateTime.now(),
+                ex.getMessage(),
+                request.getDescription(false),
+                ex.getResourceName(),
+                ex.getFieldName(),
+                ex.getFieldValue()
+        );
+
+        // Return structured JSON response with 409 Conflict status
+        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
     }
+
+
 }

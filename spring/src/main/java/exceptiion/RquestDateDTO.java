@@ -1,4 +1,4 @@
-package com.spring.demo;
+package exceptiion;
 import java.util.Date;
 public class RquestDateDTO {
     private Date date;

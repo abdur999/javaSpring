@@ -2,8 +2,11 @@ package com.spring.demo;
 
 import Response.PartialResponse;
 import Response.ValidationResponse;
+import com.spring.demo.validator.MobileNumberValidator;
 import exceptiion.ErrorDetails;
+import exceptiion.InvalidDataException;
 import exceptiion.ResourceAlreadyExistException;
+import exceptiion.RquestDateDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.json.*;
@@ -46,6 +49,9 @@ public class RestApiController {
             return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                     .body(response);
         } else {
+            if(!MobileNumberValidator.isValidMobileNumber(user.getPhoneNo())) {
+                throw new InvalidDataException("User","phone",user.getPhoneNo());
+            }
             // Logic to create the user would go here (e.g., saving to the database)
             // Save the user
             ValidationResponse validResponse = userService.checkIfExists(user.getEmail(),user.getPhoneNo());
@@ -99,6 +105,20 @@ public class RestApiController {
 
         // Return structured JSON response with 409 Conflict status
         return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(InvalidDataException.class)
+    public ResponseEntity<Object> handleInvalidMobileNumberException(InvalidDataException ex, WebRequest request) {
+        // Return a 400 Bad Request status with a custom message
+        ErrorDetails errorDetails = new ErrorDetails(
+                LocalDateTime.now(),
+                ex.getMessage(),
+                request.getDescription(false),
+                ex.getResourceName(),
+                ex.getFieldName(),
+                ex.getFieldValue()
+        );
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
